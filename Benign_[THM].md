@@ -11,19 +11,19 @@ About the Network Information
 The network is divided into three logical segments. It will help in the investigation.
 
 **IT Department**
-    James
-    Moin
-    Katrina
+- James
+- Moin
+- Katrina
 
 **HR department**
-    Haroon
-    Chris
-    Diana
+- Haroon
+- Chris
+- Diana
 
 **Marketing department**
-    Bell
-    Amelia
-    Deepak
+- Bell
+- Amelia
+- Deepak
 
 Answer the questions below
 1. How many logs are ingested from the month of March, 2022?
